@@ -24,14 +24,21 @@ function loadCart(): CartItem[] {
   try {
     const stored = localStorage.getItem(CART_STORAGE_KEY);
     return stored ? JSON.parse(stored) : [];
-  } catch { return []; }
+  } catch (error) {
+    console.warn("Failed to load cart from localStorage", error);
+    return [];
+  }
 }
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [items, setItems] = useState<CartItem[]>(loadCart);
 
   useEffect(() => {
-    try { localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items)); } catch {}
+    try {
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+    } catch (error) {
+      console.warn("Failed to save cart to localStorage", error);
+    }
   }, [items]);
 
   // Cart key includes variant combo so same product with different variants = separate cart lines
