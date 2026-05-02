@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { isSupabaseConfigured, supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Eye, EyeOff, Mail, Lock, User, ArrowRight, ShoppingBag } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -16,6 +16,10 @@ const Auth = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isSupabaseConfigured) {
+      toast.error("Auth is unavailable locally: configure VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in .env.");
+      return;
+    }
     setLoading(true);
 
     if (isLogin) {
@@ -109,6 +113,11 @@ const Auth = () => {
                 ? "Enter your credentials to access your account"
                 : "Fill in your details to get started"}
             </p>
+            {!isSupabaseConfigured && (
+              <p className="mt-3 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800">
+                Local auth is disabled until Supabase environment variables are configured.
+              </p>
+            )}
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">

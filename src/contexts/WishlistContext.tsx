@@ -17,14 +17,21 @@ function loadWishlist(): Product[] {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     return stored ? JSON.parse(stored) : [];
-  } catch { return []; }
+  } catch (error) {
+    console.warn("Failed to load wishlist from localStorage", error);
+    return [];
+  }
 }
 
 export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [items, setItems] = useState<Product[]>(loadWishlist);
 
   useEffect(() => {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); } catch {}
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    } catch (error) {
+      console.warn("Failed to save wishlist to localStorage", error);
+    }
   }, [items]);
 
   const addToWishlist = useCallback((product: Product) => {
